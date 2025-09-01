@@ -98,3 +98,11 @@ agentGateway:
 #   trafficPolicy:
 #     extProc: DeepMerge
 policyMerge: {}
+
+# -- Set pod disruption budget
+podDisruptionBudget: {}
+# For example:
+#
+# podDisruptionBudget:
+#   minAvailable: 1
+#   maxUnavailable: 0
