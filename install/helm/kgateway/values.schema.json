@@ -1,0 +1,434 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "imagePullSecrets": {
+      "type": "array",
+      "description": "Set a list of image pull secrets for Kubernetes to use when pulling container images from your own private registry instead of the default kgateway registry.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "nameOverride": {
+      "type": "string",
+      "description": "Add a name to the default Helm base release, which is 'kgateway'. If you set 'nameOverride: \"foo\", the name of the resources that the Helm release creates become 'kgateway-foo', such as the deployment, service, and service account for the kgateway control plane in the kgateway-system namespace."
+    },
+    "fullnameOverride": {
+      "type": "string",
+      "description": "Override the full name of resources created by the Helm chart, which is 'kgateway'. If you set 'fullnameOverride: \"foo\", the full name of the resources that the Helm release creates become 'foo', such as the deployment, service, and service account for the kgateway control plane in the kgateway-system namespace."
+    },
+    "serviceAccount": {
+      "type": "object",
+      "description": "Configure the service account for the deployment.",
+      "properties": {
+        "create": {
+          "type": "boolean",
+          "description": "Specify whether a service account should be created.",
+          "default": true
+        },
+        "annotations": {
+          "type": "object",
+          "description": "Add annotations to the service account.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string",
+          "description": "Set the name of the service account to use. If not set and create is true, a name is generated using the fullname template."
+        }
+      }
+    },
+    "deploymentAnnotations": {
+      "type": "object",
+      "description": "Add annotations to the kgateway deployment.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "podAnnotations": {
+      "type": "object",
+      "description": "Add annotations to the kgateway pods.",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {
+        "prometheus.io/scrape": "true"
+      }
+    },
+    "podSecurityContext": {
+      "type": "object",
+      "description": "Set the pod-level security context. For example, 'fsGroup: 2000' sets the filesystem group to 2000.",
+      "properties": {
+        "fsGroup": {
+          "type": "integer"
+        },
+        "runAsUser": {
+          "type": "integer"
+        },
+        "runAsGroup": {
+          "type": "integer"
+        },
+        "runAsNonRoot": {
+          "type": "boolean"
+        },
+        "fsGroupChangePolicy": {
+          "type": "string",
+          "enum": ["OnRootMismatch", "Always"]
+        },
+        "supplementalGroups": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "securityContext": {
+      "type": "object",
+      "description": "Set the container-level security context, such as 'runAsNonRoot: true'.",
+      "properties": {
+        "allowPrivilegeEscalation": {
+          "type": "boolean"
+        },
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "add": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "drop": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "privileged": {
+          "type": "boolean"
+        },
+        "readOnlyRootFilesystem": {
+          "type": "boolean"
+        },
+        "runAsNonRoot": {
+          "type": "boolean"
+        },
+        "runAsUser": {
+          "type": "integer"
+        },
+        "runAsGroup": {
+          "type": "integer"
+        }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "description": "Configure resource requests and limits for the container, such as 'limits.cpu: 100m' or 'requests.memory: 128Mi'.",
+      "properties": {
+        "limits": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string"
+            },
+            "memory": {
+              "type": "string"
+            }
+          }
+        },
+        "requests": {
+          "type": "object",
+          "properties": {
+            "cpu": {
+              "type": "string"
+            },
+            "memory": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "nodeSelector": {
+      "type": "object",
+      "description": "Set node selector labels for pod scheduling, such as 'kubernetes.io/arch: amd64'.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "tolerations": {
+      "type": "array",
+      "description": "Set tolerations for pod scheduling, such as 'key: \"nvidia.com/gpu\"'.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string",
+            "enum": ["Equal", "Exists"]
+          },
+          "value": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string",
+            "enum": ["NoSchedule", "PreferNoSchedule", "NoExecute"]
+          },
+          "tolerationSeconds": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "affinity": {
+      "type": "object",
+      "description": "Set affinity rules for pod scheduling, such as 'nodeAffinity:'.",
+      "properties": {
+        "nodeAffinity": {
+          "type": "object"
+        },
+        "podAffinity": {
+          "type": "object"
+        },
+        "podAntiAffinity": {
+          "type": "object"
+        }
+      }
+    },
+    "controller": {
+      "type": "object",
+      "description": "Configure the kgateway control plane deployment.",
+      "properties": {
+        "replicaCount": {
+          "type": "integer",
+          "description": "Set the number of controller pod replicas.",
+          "minimum": 1,
+          "default": 1
+        },
+        "logLevel": {
+          "type": "string",
+          "description": "Set the log level for the controller.",
+          "enum": ["trace", "debug", "info", "warn", "error", "fatal"],
+          "default": "info"
+        },
+        "image": {
+          "type": "object",
+          "description": "Configure the controller container image.",
+          "properties": {
+            "registry": {
+              "type": "string",
+              "description": "Set the image registry for the controller."
+            },
+            "repository": {
+              "type": "string",
+              "description": "Set the image repository for the controller.",
+              "default": "kgateway"
+            },
+            "pullPolicy": {
+              "type": "string",
+              "description": "Set the image pull policy for the controller.",
+              "enum": ["Always", "IfNotPresent", "Never"]
+            },
+            "tag": {
+              "type": "string",
+              "description": "Set the image tag for the controller."
+            }
+          }
+        },
+        "service": {
+          "type": "object",
+          "description": "Configure the controller service.",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Set the service type for the controller.",
+              "enum": ["ClusterIP", "NodePort", "LoadBalancer"],
+              "default": "ClusterIP"
+            },
+            "ports": {
+              "type": "object",
+              "description": "Set the service ports for gRPC and health endpoints.",
+              "properties": {
+                "grpc": {
+                  "type": "integer",
+                  "default": 9977
+                },
+                "health": {
+                  "type": "integer",
+                  "default": 9093
+                },
+                "metrics": {
+                  "type": "integer",
+                  "default": 9092
+                }
+              }
+            }
+          }
+        },
+        "extraEnv": {
+          "type": "object",
+          "description": "Add extra environment variables to the controller container.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "description": "Configure the default container image for the components that Helm deploys. You can override these settings for each particular component in that component's section, such as 'controller.image' for the kgateway control plane. If you use your own private registry, make sure to include the imagePullSecrets.",
+      "properties": {
+        "registry": {
+          "type": "string",
+          "description": "Set the default image registry.",
+          "default": "cr.kgateway.dev/kgateway-dev"
+        },
+        "tag": {
+          "type": "string",
+          "description": "Set the default image tag."
+        },
+        "pullPolicy": {
+          "type": "string",
+          "description": "Set the default image pull policy.",
+          "enum": ["Always", "IfNotPresent", "Never"],
+          "default": "IfNotPresent"
+        }
+      }
+    },
+    "inferenceExtension": {
+      "type": "object",
+      "description": "Configure the integration with the Gateway API Inference Extension project, which lets you use kgateway to route to AI inference workloads like LLMs that run locally in your Kubernetes cluster. Documentation for Inference Extension can be found here: https://kgateway.dev/docs/integrations/inference-extension/",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable Inference Extension.",
+          "default": false
+        },
+        "autoProvision": {
+          "type": "boolean",
+          "description": "Enable automatic provisioning for Inference Extension.",
+          "default": false
+        }
+      }
+    },
+    "discoveryNamespaceSelectors": {
+      "type": "array",
+      "description": "List of namespace selectors (OR'ed): each entry can use 'matchLabels' or 'matchExpressions' (AND'ed within each entry if used together). Kgateway includes the selected namespaces in config discovery. For more information, see the docs https://kgateway.dev/docs/operations/install/#namespace-discovery.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "matchLabels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "matchExpressions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "operator": {
+                  "type": "string",
+                  "enum": ["In", "NotIn", "Exists", "DoesNotExist"]
+                },
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": ["key", "operator"]
+            }
+          }
+        }
+      }
+    },
+    "agentGateway": {
+      "type": "object",
+      "description": "Enable the integration with Agent Gateway, which lets you use kgateway to help manage agent connectivity across MCP servers, A2A agents, and REST APIs.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "policyMerge": {
+      "type": "object",
+      "description": "Policy merging settings. Currently, TrafficPolicy's extAuth, extProc, and transformation policies support deep merging.",
+      "properties": {
+        "trafficPolicy": {
+          "type": "object",
+          "properties": {
+            "extAuth": {
+              "type": "string",
+              "enum": ["DeepMerge", "Replace"]
+            },
+            "extProc": {
+              "type": "string",
+              "enum": ["DeepMerge", "Replace"]
+            },
+            "transformation": {
+              "type": "string",
+              "enum": ["DeepMerge", "Replace"]
+            }
+          }
+        }
+      }
+    },
+    "podDisruptionBudget": {
+      "type": "object",
+      "description": "Set pod disruption budget",
+      "properties": {
+        "minAvailable": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9]+%$"
+            }
+          ],
+          "description": "An eviction is allowed if at least minAvailable pods will still be available after the eviction."
+        },
+        "maxUnavailable": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9]+%$"
+            }
+          ],
+          "description": "An eviction is allowed if at most maxUnavailable pods are unavailable after the eviction."
+        },
+        "unhealthyPodEvictionPolicy": {
+          "type": "string",
+          "enum": ["IfHealthyBudget", "AlwaysAllow"],
+          "description": "Defines the policy for handling unhealthy pods during eviction."
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

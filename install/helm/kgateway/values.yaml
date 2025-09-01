@@ -54,7 +54,7 @@ controller:
     # -- Set the image repository for the controller.
     repository: kgateway
     # -- Set the image pull policy for the controller.
-    pullPolicy: ""
+    pullPolicy: IfNotPresent
     # -- Set the image tag for the controller.
     tag: ""
   # -- Configure the controller service.
